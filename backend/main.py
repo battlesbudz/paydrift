@@ -44,7 +44,12 @@ app.include_router(stripe.router, prefix="/api/stripe", tags=["stripe"])
 app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
 
 
-@app.get("/api/health")
+@app.get("/")
+async def root():
+    return {"service": "paydrift", "status": "ok", "version": "1.0.0"}
+
+
+@app.get("/health")
 async def health():
     return {"status": "ok", "service": "paydrift", "version": "1.0.0"}
 
