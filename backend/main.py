@@ -78,12 +78,6 @@ async def serve_spa(path: str):
 async def http_exception_handler(request: Request, exc: HTTPException):
     return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
 
-@app.api_view(["GET", "POST"])
-async def test_all(path: str, request: Request):
-    print(f"TEST_ENDPOINT: {request.method} /{path} - Headers: {dict(request.headers)}")
-    return {"received": f"/{path}", "method": request.method}
-
-# Test endpoint to debug Railway edge routing
 @app.get("/t")
 async def test_root():
     return {"test": "ok", "path": "/"}
