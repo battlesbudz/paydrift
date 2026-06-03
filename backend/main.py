@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 import os
@@ -43,15 +43,32 @@ app.include_router(invoices.router, prefix="/api/invoices", tags=["invoices"])
 app.include_router(stripe.router, prefix="/api/stripe", tags=["stripe"])
 app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
 
+# Serve React frontend built files (SPA)
+# Mount at /app/static for the dist directory structure
+frontend_path = os.path.join(os.path.dirname(__file__), "..", "paydrift-frontend", "dist")
+if os.path.isdir(frontend_path):
+    app.mount("/static", StaticFiles(directory=frontend_path), name="static")
 
 @app.get("/")
 async def root():
-    return "OK"
+    if os.path.isdir(frontend_path):
+        return FileResponse(os.path.join(frontend_path, "index.html"))
+    return {"status": "ok", "service": "paydrift-api"}
 
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "service": "paydrift", "version": "1.0.0"}
+    return {"status": "ok", "service": "paydrift"}
+
+
+@app.get("/{path:path}")
+async def serve_spa(path: str):
+    # Only serve SPA for non-API paths when frontend dist exists
+    if not path.startswith("api/") and os.path.isdir(frontend_path):
+        index_path = os.path.join(frontend_path, "index.html")
+        if os.path.isfile(index_path):
+            return FileResponse(index_path)
+    raise HTTPException(status_code=404, detail="Not found")
 
 
 @app.exception_handler(HTTPException)
