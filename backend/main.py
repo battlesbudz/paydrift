@@ -37,11 +37,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
-app.include_router(clients.router, prefix="/api/clients", tags=["clients"])
-app.include_router(invoices.router, prefix="/api/invoices", tags=["invoices"])
-app.include_router(stripe.router, prefix="/api/stripe", tags=["stripe"])
-app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
+app.include_router(auth.router, prefix="/v1/auth", tags=["auth"])
+app.include_router(clients.router, prefix="/v1/clients", tags=["clients"])
+app.include_router(invoices.router, prefix="/v1/invoices", tags=["invoices"])
+app.include_router(stripe.router, prefix="/v1/stripe", tags=["stripe"])
+app.include_router(dashboard.router, prefix="/v1/dashboard", tags=["dashboard"])
 
 # Serve React frontend built files (SPA)
 # Serve React frontend built files (SPA) - copied into backend/static_frontend/
@@ -64,10 +64,13 @@ async def health():
 @app.get("/{path:path}")
 async def serve_spa(path: str):
     # Only serve SPA for non-API paths when frontend dist exists
-    if not path.startswith("api/") and os.path.isdir(frontend_path):
-        index_path = os.path.join(frontend_path, "index.html")
-        if os.path.isfile(index_path):
-            return FileResponse(index_path)
+    # Don't intercept /v1/* (API), /static/* (assets), /health (health check), /docs (swagger)
+    reserved = ["v1", "static", "docs", "redoc", "openapi", "health"]
+    if path not in reserved and not any(path.startswith(p + "/") for p in reserved):
+        if os.path.isdir(frontend_path):
+            index_path = os.path.join(frontend_path, "index.html")
+            if os.path.isfile(index_path):
+                return FileResponse(index_path)
     raise HTTPException(status_code=404, detail="Not found")
 
 
