@@ -44,8 +44,8 @@ app.include_router(stripe.router, prefix="/api/stripe", tags=["stripe"])
 app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
 
 # Serve React frontend built files (SPA)
-# Mount at /app/static for the dist directory structure
-frontend_path = os.path.join(os.path.dirname(__file__), "..", "paydrift-frontend", "dist")
+# Serve React frontend built files (SPA) - copied into backend/static_frontend/
+frontend_path = os.path.join(os.path.dirname(__file__), "static_frontend")
 if os.path.isdir(frontend_path):
     app.mount("/static", StaticFiles(directory=frontend_path), name="static")
 
