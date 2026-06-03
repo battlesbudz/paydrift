@@ -37,17 +37,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Explicit API routes - these are ordered FIRST, before any catch-all
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(clients.router, prefix="/api/clients", tags=["clients"])
 app.include_router(invoices.router, prefix="/api/invoices", tags=["invoices"])
 app.include_router(stripe.router, prefix="/api/stripe", tags=["stripe"])
 app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
 
-# Serve React frontend built files (SPA)
-# Serve React frontend built files (SPA) - copied into backend/static_frontend/
+# Serve React frontend built files (SPA) - embedded in backend/static_frontend/
 frontend_path = os.path.join(os.path.dirname(__file__), "static_frontend")
 if os.path.isdir(frontend_path):
     app.mount("/static", StaticFiles(directory=frontend_path), name="static")
+
 
 @app.get("/")
 async def root():
@@ -61,23 +62,9 @@ async def health():
     return {"status": "ok", "service": "paydrift"}
 
 
-@app.get("/{path:path}")
-async def serve_spa(path: str):
-    # Only serve SPA for non-API paths when frontend dist exists
-    # Don't intercept /v1/* (API), /static/* (assets), /health (health check), /docs (swagger)
-    reserved = ["v1", "static", "docs", "redoc", "openapi", "health"]
-    if path not in reserved and not any(path.startswith(p + "/") for p in reserved):
-        if os.path.isdir(frontend_path):
-            index_path = os.path.join(frontend_path, "index.html")
-            if os.path.isfile(index_path):
-                return FileResponse(index_path)
-    raise HTTPException(status_code=404, detail="Not found")
-
-
-@app.exception_handler(HTTPException)
-async def http_exception_handler(request: Request, exc: HTTPException):
-    return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
-
-@app.get("/t")
-async def test_root():
-    return {"test": "ok", "path": "/"}
+# NOTE: No /{path:path} catch-all route.
+# FastAPI will return 404 for any unmatched path not covered by:
+#   - explicit @app.get() routes above
+#   - include_router() prefixed routes (api/auth, api/clients, etc.)
+#   - mounted StaticFiles at /static
+# This is the correct behavior - Railway Edge handles its own 404 for truly missing paths.
