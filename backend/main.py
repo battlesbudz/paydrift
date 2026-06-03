@@ -46,7 +46,7 @@ app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"]
 
 @app.get("/")
 async def root():
-    return {"service": "paydrift", "status": "ok", "version": "1.0.0"}
+    return "OK"
 
 
 @app.get("/health")
