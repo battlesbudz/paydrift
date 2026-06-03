@@ -1,3 +1,12 @@
-[Phase]
-BuildCommand = "pip install -r backend/requirements.txt"
-StartCommand = "uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
+[nixpacks]
+app_dir = "backend"
+python_version = "3.11"
+
+[phases.setup]
+nixPkgs = ["python3", "python3Packages.pip"]
+
+[phases.build]
+cmds = ["pip install --no-cache-dir -r requirements.txt"]
+
+[start]
+cmd = "uvicorn main:app --host 0.0.0.0 --port $PORT"
