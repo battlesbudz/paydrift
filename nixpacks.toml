@@ -1,0 +1,8 @@
+[nixpacks]
+environment = "python"
+
+# Tell nixpacks to use the backend directory as the project root
+PLAN_DIRECTORY = "backend"
+
+[start]
+cmd = "python -m uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"
