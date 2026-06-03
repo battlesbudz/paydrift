@@ -1,4 +1,4 @@
-const API_BASE = '/api';
+const API_BASE = '/app';
 
 async function apiFetch(path: string, options: RequestInit = {}) {
   const token = localStorage.getItem('paydrift_token');

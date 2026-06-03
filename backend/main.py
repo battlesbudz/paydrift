@@ -37,15 +37,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Explicit API routes - these are ordered FIRST, before any catch-all
-app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
-app.include_router(clients.router, prefix="/api/clients", tags=["clients"])
-app.include_router(invoices.router, prefix="/api/invoices", tags=["invoices"])
-app.include_router(stripe.router, prefix="/api/stripe", tags=["stripe"])
-app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
+# API routes - /app prefix avoids Railway Edge /api conflicts
+app.include_router(auth.router, prefix="/app/auth", tags=["auth"])
+app.include_router(clients.router, prefix="/app/clients", tags=["clients"])
+app.include_router(invoices.router, prefix="/app/invoices", tags=["invoices"])
+app.include_router(stripe.router, prefix="/app/stripe", tags=["stripe"])
+app.include_router(dashboard.router, prefix="/app/dashboard", tags=["dashboard"])
 
 # Serve React frontend built files (SPA) - embedded in backend/static_frontend/
+# NOTE: static files served at /static, SPA entry at /
 frontend_path = os.path.join(os.path.dirname(__file__), "static_frontend")
+import logging
+logger = logging.getLogger("paydrift")
 if os.path.isdir(frontend_path):
     app.mount("/static", StaticFiles(directory=frontend_path), name="static")
 
