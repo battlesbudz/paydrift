@@ -37,11 +37,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router, prefix="/v1/auth", tags=["auth"])
-app.include_router(clients.router, prefix="/v1/clients", tags=["clients"])
-app.include_router(invoices.router, prefix="/v1/invoices", tags=["invoices"])
-app.include_router(stripe.router, prefix="/v1/stripe", tags=["stripe"])
-app.include_router(dashboard.router, prefix="/v1/dashboard", tags=["dashboard"])
+app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
+app.include_router(clients.router, prefix="/api/clients", tags=["clients"])
+app.include_router(invoices.router, prefix="/api/invoices", tags=["invoices"])
+app.include_router(stripe.router, prefix="/api/stripe", tags=["stripe"])
+app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
 
 # Serve React frontend built files (SPA)
 # Serve React frontend built files (SPA) - copied into backend/static_frontend/
@@ -77,3 +77,13 @@ async def serve_spa(path: str):
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
     return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
+
+@app.api_view(["GET", "POST"])
+async def test_all(path: str, request: Request):
+    print(f"TEST_ENDPOINT: {request.method} /{path} - Headers: {dict(request.headers)}")
+    return {"received": f"/{path}", "method": request.method}
+
+# Test endpoint to debug Railway edge routing
+@app.get("/t")
+async def test_root():
+    return {"test": "ok", "path": "/"}
