@@ -11,6 +11,9 @@ from scheduler import start_scheduler, stop_scheduler
 
 FRONTEND_URL = os.getenv("FRONTEND_URL", "https://paydrift.app")
 
+# Frontend path — built React app lives in backend/static_frontend/
+frontend_path = os.path.join(os.path.dirname(__file__), "static_frontend")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -37,18 +40,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# API routes - /app prefix avoids Railway Edge /api conflicts
+# API routes — /app prefix avoids Railway Edge /api conflicts
 app.include_router(auth.router, prefix="/app/auth", tags=["auth"])
 app.include_router(clients.router, prefix="/app/clients", tags=["clients"])
 app.include_router(invoices.router, prefix="/app/invoices", tags=["invoices"])
 app.include_router(stripe.router, prefix="/app/stripe", tags=["stripe"])
 app.include_router(dashboard.router, prefix="/app/dashboard", tags=["dashboard"])
 
-# Serve React frontend built files (SPA) - embedded in backend/static_frontend/
-# NOTE: static files served at /static, SPA entry at /
-frontend_path = os.path.join(os.path.dirname(__file__), "static_frontend")
-import logging
-logger = logging.getLogger("paydrift")
+# Serve React frontend built files (SPA) — embedded in backend/static_frontend/
 if os.path.isdir(frontend_path):
     app.mount("/static", StaticFiles(directory=frontend_path), name="static")
 
@@ -60,6 +59,17 @@ async def root():
     return {"status": "ok", "service": "paydrift-api"}
 
 
+@app.get("/debug")
+async def debug():
+    return {
+        "cwd": os.getcwd(),
+        "frontend_path": frontend_path,
+        "exists": os.path.isdir(frontend_path),
+        "files": os.listdir(frontend_path) if os.path.isdir(frontend_path) else [],
+        "main_dir": os.path.dirname(__file__),
+    }
+
+
 @app.get("/health")
 async def health():
     return {"status": "ok", "service": "paydrift"}
@@ -68,6 +78,6 @@ async def health():
 # NOTE: No /{path:path} catch-all route.
 # FastAPI will return 404 for any unmatched path not covered by:
 #   - explicit @app.get() routes above
-#   - include_router() prefixed routes (api/auth, api/clients, etc.)
+#   - include_router() prefixed routes (app/auth, app/clients, etc.)
 #   - mounted StaticFiles at /static
-# This is the correct behavior - Railway Edge handles its own 404 for truly missing paths.
+# This is the correct behavior — Railway Edge handles its own 404 for truly missing paths.
