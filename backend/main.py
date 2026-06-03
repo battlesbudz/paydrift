@@ -40,12 +40,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# API routes — /app prefix avoids Railway Edge /api conflicts
-app.include_router(auth.router, prefix="/app/auth", tags=["auth"])
-app.include_router(clients.router, prefix="/app/clients", tags=["clients"])
-app.include_router(invoices.router, prefix="/app/invoices", tags=["invoices"])
-app.include_router(stripe.router, prefix="/app/stripe", tags=["stripe"])
-app.include_router(dashboard.router, prefix="/app/dashboard", tags=["dashboard"])
+# API routes
+app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
+app.include_router(clients.router, prefix="/api/clients", tags=["clients"])
+app.include_router(invoices.router, prefix="/api/invoices", tags=["invoices"])
+app.include_router(stripe.router, prefix="/api/stripe", tags=["stripe"])
+app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
 
 # Serve React frontend built files (SPA) — embedded in backend/static_frontend/
 if os.path.isdir(frontend_path):
