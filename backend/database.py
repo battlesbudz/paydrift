@@ -11,7 +11,16 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./paydrift.db")
+_raw = os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL") or ""
+if not _raw:
+    DATABASE_URL = "sqlite+aiosqlite:///./paydrift.db"
+elif _raw.startswith("postgresql://"):
+    # Convert sync psycopg2 URL to async asyncpg URL
+    DATABASE_URL = _raw.replace("postgresql://", "postgresql+asyncpg://", 1)
+elif _raw.startswith("postgres://"):
+    DATABASE_URL = _raw.replace("postgres://", "postgresql+asyncpg://", 1)
+else:
+    DATABASE_URL = _raw
 
 engine = create_async_engine(DATABASE_URL, echo=False, pool_pre_ping=True)
 AsyncSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
