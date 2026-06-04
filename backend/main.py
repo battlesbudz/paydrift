@@ -54,8 +54,10 @@ app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"]
 # Serve React frontend built files (SPA) — embedded in backend/static_frontend/
 # Mount at /assets and /static for the JS/CSS chunks (legacy + new paths), plus / for the SPA catch-all
 if os.path.isdir(frontend_path):
+    # Mount at /assets for Vite-built chunks (index.html references /assets/index-*.js)
+    app.mount("/assets", StaticFiles(directory=frontend_path, html=False), name="assets")
+    # Mount at /static for SPA catch-all (html=True so /static/ returns index.html)
     app.mount("/static", StaticFiles(directory=frontend_path, html=True), name="static")
-    app.mount("/assets", StaticFiles(directory=frontend_path, html=True), name="assets")
     app.mount("/icons.svg", StaticFiles(directory=frontend_path), name="icons")
     app.mount("/favicon.svg", StaticFiles(directory=frontend_path), name="favicon")
 
