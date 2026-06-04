@@ -1,18 +1,22 @@
+import sys, os
+# Fix Python path so imports work regardless of where Railway runs from
+_backend_dir = os.path.dirname(os.path.abspath(__file__))
+if _backend_dir not in sys.path:
+    sys.path.insert(0, _backend_dir)
+
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
-import os
 
 from database import engine, Base
 from routes import auth, clients, invoices, stripe, dashboard
 from scheduler import start_scheduler, stop_scheduler
 
 FRONTEND_URL = os.getenv("FRONTEND_URL", "https://paydrift.app")
-
-# Frontend path — built React app lives in backend/static_frontend/
-frontend_path = os.path.join(os.path.dirname(__file__), "static_frontend")
+# Frontend path — built React app lives in backend/
+frontend_path = _backend_dir
 
 
 @asynccontextmanager
@@ -59,15 +63,23 @@ async def root():
     return {"status": "ok", "service": "paydrift-api"}
 
 
+# Test if new deployment picked up changes — /debug endpoint
 @app.get("/debug")
 async def debug():
+    import datetime
     return {
+        "service": "paydrift",
+        "version": "2",
         "cwd": os.getcwd(),
         "frontend_path": frontend_path,
-        "exists": os.path.isdir(frontend_path),
-        "files": os.listdir(frontend_path) if os.path.isdir(frontend_path) else [],
-        "main_dir": os.path.dirname(__file__),
+        "static_frontend_exists": os.path.isdir(frontend_path),
+        "routes_loaded": True,
+        "ts": datetime.datetime.utcnow().isoformat(),
     }
+
+@app.get("/api/test")
+async def api_test():
+    return {"status": "ok", "message": "API routing works!"}
 
 
 @app.get("/health")
