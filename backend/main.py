@@ -69,7 +69,7 @@ async def debug():
     import datetime
     return {
         "service": "paydrift",
-        "version": "3",
+        "version": "2",
         "cwd": os.getcwd(),
         "frontend_path": frontend_path,
         "static_frontend_exists": os.path.isdir(frontend_path),
