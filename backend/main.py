@@ -15,8 +15,8 @@ from routes import auth, clients, invoices, stripe, dashboard
 from scheduler import start_scheduler, stop_scheduler
 
 FRONTEND_URL = os.getenv("FRONTEND_URL", "https://paydrift.app")
-# Frontend path — built React app lives in backend/
-frontend_path = _backend_dir
+# Frontend path — built React app lives in backend/static_frontend/
+frontend_path = os.path.join(_backend_dir, "static_frontend")
 
 
 @asynccontextmanager
@@ -80,6 +80,15 @@ async def debug():
 @app.get("/api/test")
 async def api_test():
     return {"status": "ok", "message": "API routing works!"}
+
+
+@app.get("/{path:path}")
+async def serve_spa(path: str):
+    """Serve React SPA for any non-API path (enables client-side routing)."""
+    spa_index = os.path.join(frontend_path, "index.html")
+    if os.path.isfile(spa_index):
+        return FileResponse(spa_index)
+    raise HTTPException(status_code=404, detail="Not Found")
 
 
 @app.get("/health")
