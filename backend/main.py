@@ -9,7 +9,6 @@ if _backend_dir not in sys.path:
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 
 from database import engine, Base
@@ -54,14 +53,32 @@ app.include_router(stripe.router, prefix="/api/stripe", tags=["stripe"])
 app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
 
 # Serve React frontend built files (SPA) — embedded in backend/static_frontend/
-# Mount at /assets and /static for the JS/CSS chunks (legacy + new paths), plus / for the SPA catch-all
-if os.path.isdir(frontend_path):
-    # Mount at /assets for Vite-built chunks (index.html references /assets/index-*.js)
-    app.mount("/assets", StaticFiles(directory=frontend_path, html=False), name="assets")
-    # Mount at /static for SPA catch-all (html=True so /static/ returns index.html)
-    app.mount("/static", StaticFiles(directory=frontend_path, html=True), name="static")
-    app.mount("/icons.svg", StaticFiles(directory=frontend_path), name="icons")
-    app.mount("/favicon.svg", StaticFiles(directory=frontend_path), name="favicon")
+# Direct file serving via FileResponse (avoids StaticFiles issues on Railway)
+# NOTE: Mount at /app NOT / to avoid shadowing /api/* routes
+
+
+@app.get("/assets/{rest:path}")
+async def serve_assets(rest: str):
+    """Serve static assets (JS, CSS, imgs) from frontend build.
+    
+    The request path is /assets/<rest>. FastAPI consumes /assets as the route prefix,
+    so rest gets 'assets/index.js' (or 'icons.svg', etc.).
+    We join it to frontend_path to get the actual file.
+    """
+    file_path = os.path.join(frontend_path, "assets", rest)
+    if os.path.isfile(file_path):
+        return FileResponse(file_path)
+    raise HTTPException(status_code=404, detail="Not Found")
+
+
+@app.get("/icons.svg")
+async def serve_icons():
+    return FileResponse(os.path.join(frontend_path, "icons.svg"))
+
+
+@app.get("/favicon.svg")
+async def serve_favicon():
+    return FileResponse(os.path.join(frontend_path, "favicon.svg"))
 
 
 @app.get("/")
