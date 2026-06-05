@@ -1,6 +1,2 @@
-[railway]
-builder = "dockerfile"
-dockerfilePath = "Dockerfile"
-
 [healthcheck]
 path = "/health"
