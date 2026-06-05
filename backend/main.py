@@ -119,15 +119,10 @@ async def v1_test():
 
 @app.get("/health")
 async def health():
-    """Railway health check — must return HTTP 200 with JSON body."""
-    return {"status": "ok", "service": "paydrift-backend", "new": True}
-
-
-@app.get("/__railway_new_container_2024")
-async def railway_marker():
-    """Unique marker endpoint — only exists in the NEW container (commit 47ed28a+).
-    Used to confirm Railway Edge has switched to the new container."""
-    return {"marker": "new_container", "version": "47ed28a"}
+    """Railway health check — returns HTTP 200 OK with plain text.
+    Must match what Railway Edge expects for the health check probe."""
+    from fastapi.responses import PlainTextResponse
+    return PlainTextResponse("OK", media_type="text/plain")
 
 
 @app.get("/{path:path}")
