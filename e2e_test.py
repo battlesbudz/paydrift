@@ -6,7 +6,7 @@ Tests the full user journey: landing → register → dashboard → client → i
 import time, sys, random
 from playwright.sync_api import sync_playwright, expect
 
-BASE_URL = "https://paydrift-backend.railway.app"
+BASE_URL = "https://paydrift-backend-production.up.railway.app"
 
 def random_email():
     return f"test_{int(time.time())}_{random.randint(1000,9999)}@testmail.com"

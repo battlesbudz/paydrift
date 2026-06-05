@@ -1,8 +1,9 @@
+# Build args to break Railway cache
+ARG CACHE_DATE=2026-06-05-0930
+
 FROM python:3.11-slim
 
 WORKDIR /app
-
-# Install dependencies
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
