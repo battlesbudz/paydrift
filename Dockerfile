@@ -1,5 +1,5 @@
 # Build args to break Railway cache
-ARG CACHE_DATE=2026-06-05-0930
+ARG CACHE_DATE=2026-06-05-1000
 
 FROM python:3.11-slim
 

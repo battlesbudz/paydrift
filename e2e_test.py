@@ -31,7 +31,7 @@ def run_tests():
             
             tests = [
                 ("Landing page loads", lambda: page.goto(BASE_URL, wait_until="networkidle")),
-                ("Landing page title correct", lambda: expect(page).to_have_title("PayDrift")),
+                ("Landing page title correct", lambda: expect(page).to_have_title("PayDrift — Stop chasing. Start getting paid.")),
                 ("Hero section visible", lambda: page.locator("h1").first.wait_for(state="visible")),
                 ("Navigation visible", lambda: page.locator("nav").first.wait_for(state="visible")),
                 ("'Get Started' button exists", lambda: page.get_by_text("Get Started").first.wait_for(state="visible")),
