@@ -109,7 +109,9 @@ async def api_test():
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "service": "paydrift"}
+    """Railway health check — returns plain text OK."""
+    from fastapi.responses import PlainTextResponse
+    return PlainTextResponse("OK", media_type="text/plain")
 
 
 @app.get("/{path:path}")
