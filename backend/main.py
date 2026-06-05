@@ -88,10 +88,9 @@ async def serve_favicon():
 @app.get("/")
 async def root():
     # Railway Edge intercepts "/" and replaces JSON/HTML responses with its placeholder page.
-    # This endpoint is purely for Railway's health check. It returns 200 OK with no body
-    # so there's nothing for Edge to replace. Railway will mark this as healthy.
-    from starlette.responses import Response
-    return Response(status_code=200)
+    # Return custom text "PAYDRIFT-NEW" with 200 so Railway can distinguish from OLD container.
+    from starlette.responses import PlainTextResponse
+    return PlainTextResponse("PAYDRIFT-NEW-CONTAINER", status_code=200)
 
 
 @app.get("/v1/hc")
