@@ -119,9 +119,8 @@ async def v1_test():
 
 @app.get("/health")
 async def health():
-    """Railway health check — returns plain text OK."""
-    from fastapi.responses import PlainTextResponse
-    return PlainTextResponse("OK", media_type="text/plain")
+    """Railway health check — must return HTTP 200 with JSON body."""
+    return {"status": "ok", "service": "paydrift-backend"}
 
 
 @app.get("/{path:path}")
