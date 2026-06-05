@@ -83,10 +83,10 @@ async def serve_favicon():
 
 @app.get("/")
 async def root():
-    # Fast path: Railway health checks "/" — return 200 immediately without
-    # hitting the filesystem. The SPA is served at /app for actual users.
-    from fastapi.responses import JSONResponse
-    return JSONResponse({"status": "ok", "service": "paydrift"}, media_type="application/json")
+    # Fast path: Railway health checks "/" — return plain text OK immediately.
+    # The SPA is served at /app for actual users. Non-root health checks at /health.
+    from fastapi.responses import PlainTextResponse
+    return PlainTextResponse("OK", media_type="text/plain")
 
 
 @app.get("/debug")
