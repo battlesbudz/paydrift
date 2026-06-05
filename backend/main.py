@@ -120,7 +120,14 @@ async def v1_test():
 @app.get("/health")
 async def health():
     """Railway health check — must return HTTP 200 with JSON body."""
-    return {"status": "ok", "service": "paydrift-backend"}
+    return {"status": "ok", "service": "paydrift-backend", "new": True}
+
+
+@app.get("/__railway_new_container_2024")
+async def railway_marker():
+    """Unique marker endpoint — only exists in the NEW container (commit 47ed28a+).
+    Used to confirm Railway Edge has switched to the new container."""
+    return {"marker": "new_container", "version": "47ed28a"}
 
 
 @app.get("/{path:path}")
