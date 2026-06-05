@@ -1,5 +1,0 @@
-[railway]
-startCommand = "PYTHONPATH=backend python main.py"
-
-[build]
-builder = "nixpacks"
