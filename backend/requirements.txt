@@ -2,7 +2,9 @@ fastapi==0.115.0
 uvicorn[standard]==0.30.6
 sqlalchemy[asyncio]==2.0.35
 aiosqlite==0.20.0
-asyncpg==0.29.0
+# asyncpg excluded — Railway uses Python 3.13 which has no prebuilt wheels for asyncpg==0.29.0
+# The app runs on SQLite (aiosqlite) so asyncpg is not strictly needed
+# asyncpg==0.29.0
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.9
