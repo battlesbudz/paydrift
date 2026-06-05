@@ -69,7 +69,6 @@ async def root():
     return {"status": "ok", "service": "paydrift-api"}
 
 
-# Test if new deployment picked up changes — /debug endpoint
 @app.get("/debug")
 async def debug():
     import datetime
@@ -88,6 +87,11 @@ async def api_test():
     return {"status": "ok", "message": "API routing works!"}
 
 
+@app.get("/health")
+async def health():
+    return {"status": "ok", "service": "paydrift"}
+
+
 @app.get("/{path:path}")
 async def serve_spa(path: str):
     """Serve React SPA for any non-API path (enables client-side routing)."""
@@ -95,11 +99,6 @@ async def serve_spa(path: str):
     if os.path.isfile(spa_index):
         return FileResponse(spa_index)
     raise HTTPException(status_code=404, detail="Not Found")
-
-
-@app.get("/health")
-async def health():
-    return {"status": "ok", "service": "paydrift"}
 
 
 # NOTE: No /{path:path} catch-all route.
