@@ -1,8 +1,0 @@
-[railway]
-language = "python"
-
-[build]
-builder = "nixpacks"
-
-[nixpacks]
-python_version = "3.11"
