@@ -83,9 +83,10 @@ async def serve_favicon():
 
 @app.get("/")
 async def root():
-    if os.path.isdir(frontend_path):
-        return FileResponse(os.path.join(frontend_path, "index.html"))
-    return {"status": "ok", "service": "paydrift-api"}
+    # Fast path: Railway health checks "/" — return 200 immediately without
+    # hitting the filesystem. The SPA is served at /app for actual users.
+    from fastapi.responses import JSONResponse
+    return JSONResponse({"status": "ok", "service": "paydrift"}, media_type="application/json")
 
 
 @app.get("/debug")
