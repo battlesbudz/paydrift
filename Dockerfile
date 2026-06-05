@@ -5,5 +5,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ .
 ENV PORT=8000
 EXPOSE 8000
-# Railway healthchecks / by default - no Railway.toml needed
 CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
