@@ -83,10 +83,10 @@ async def serve_favicon():
 
 @app.get("/")
 async def root():
-    # Railway health checks "/" — must return plain text so Edge doesn't wrap with HTML.
-    # Edge intercepts JSON/text-html responses and replaces the body with its placeholder page.
-    from fastapi.responses import PlainTextResponse
-    return PlainTextResponse("OK", media_type="text/plain")
+    # Railway Edge intercepts "/" and replaces JSON/HTML responses with its placeholder.
+    # Return 204 No Content — no body for Edge to intercept, and Railway accepts 2xx as healthy.
+    from starlette.responses import Response
+    return Response(status_code=204)
 
 
 @app.get("/debug")
