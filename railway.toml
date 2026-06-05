@@ -2,7 +2,7 @@
 language = "python"
 
 [build]
-builder = "railpack"
+builder = "nixpacks"
 
 [nixpacks]
 python_version = "3.11"
