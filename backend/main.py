@@ -1,7 +1,7 @@
 import sys, os
 # Build timestamp - forces Docker cache refresh
-# Deployed: 2026-06-05T10:05 UTC
-_build_info = "deployed-2026-06-05-1005"
+# Deployed: 2026-06-05T16:00 UTC
+_build_info = "deployed-2026-06-05-1600"
 _backend_dir = os.path.dirname(os.path.abspath(__file__))
 if _backend_dir not in sys.path:
     sys.path.insert(0, _backend_dir)
