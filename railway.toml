@@ -1,5 +1,6 @@
 [railway]
 language = "python"
+# Build from repo root — Dockerfile at root copies backend/
 
 [build]
 builder = "dockerfile"
