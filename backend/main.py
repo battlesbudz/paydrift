@@ -52,6 +52,10 @@ app.include_router(invoices.router, prefix="/v1/invoices", tags=["invoices"])
 app.include_router(stripe.router, prefix="/v1/stripe", tags=["stripe"])
 app.include_router(dashboard.router, prefix="/v1/dashboard", tags=["dashboard"])
 
+import logging, sys
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+logging.info("Registered routes: " + ", ".join(r.path for r in app.routes))
+
 # Serve React frontend built files (SPA) — embedded in backend/static_frontend/
 # Direct file serving via FileResponse (avoids StaticFiles issues on Railway)
 # NOTE: Mount at /app NOT / to avoid shadowing /api/* routes
@@ -93,7 +97,14 @@ async def root():
 @app.get("/v1/hc")
 async def health_check_v1():
     """Health check endpoint at /v1/hc to confirm new code is deployed."""
-    return {"status": "ok", "version": "v1-routes", "deployed": True}
+    import datetime
+    return {
+        "status": "ok",
+        "version": "v1-routes",
+        "deployed": True,
+        "routes": [r.path for r in app.routes][:20],
+        "ts": datetime.datetime.utcnow().isoformat()
+    }
 
 
 @app.get("/debug")

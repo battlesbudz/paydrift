@@ -13,6 +13,11 @@ COPY . .
 ENV PORT=8000
 EXPOSE 8000
 
+# Force non-cached rebuild (healthcheckPath set to /v1/hc): add unique comment per deploy
+# This invalidates the Docker cache for all subsequent layers
+ARG DEPLOY_TS
+LABEL deploy_timestamp=${DEPLOY_TS:-unknown}
+
 # Health check: Railway probes /health (which returns plain text OK)
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
   CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:${PORT}/health')" || exit 1
