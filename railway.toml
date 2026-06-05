@@ -3,7 +3,7 @@ language = "python"
 rootDirectory = "backend"
 
 [build]
-builder = "nixpacks"
+builder = "dockerfile"
 
 [deploy]
 startCommand = "python -m uvicorn main:app --host 0.0.0.0 --port 8000"
