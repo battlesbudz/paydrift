@@ -83,10 +83,11 @@ async def serve_favicon():
 
 @app.get("/")
 async def root():
-    # Railway Edge intercepts "/" and replaces JSON/HTML responses with its placeholder.
-    # Return 204 No Content — no body for Edge to intercept, and Railway accepts 2xx as healthy.
+    # Railway Edge intercepts "/" and replaces JSON/HTML responses with its placeholder page.
+    # This endpoint is purely for Railway's health check. It returns 200 OK with no body
+    # so there's nothing for Edge to replace. Railway will mark this as healthy.
     from starlette.responses import Response
-    return Response(status_code=204)
+    return Response(status_code=200)
 
 
 @app.get("/debug")
