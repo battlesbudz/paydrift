@@ -90,11 +90,15 @@ async def root():
     return Response(status_code=200)
 
 
+@app.get("/v1/hc")
+async def health_check_v1():
+    """Health check endpoint at /v1/hc to confirm new code is deployed."""
+    return {"status": "ok", "version": "v1-routes", "deployed": True}
+
+
 @app.get("/debug")
 async def debug():
-    import datetime
     return {
-        "service": "paydrift",
         "version": "2",
         "cwd": os.getcwd(),
         "frontend_path": frontend_path,
