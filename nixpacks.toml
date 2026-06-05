@@ -1,0 +1,5 @@
+[nixpacks]
+environment = "python"
+
+[gen]
+appDir = "backend"
