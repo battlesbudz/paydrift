@@ -14,11 +14,14 @@ load_dotenv()
 _raw = os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL") or ""
 if not _raw:
     DATABASE_URL = "sqlite+aiosqlite:///./paydrift.db"
-elif _raw.startswith("postgresql://"):
-    # Convert sync psycopg2 URL to async asyncpg URL
-    DATABASE_URL = _raw.replace("postgresql://", "postgresql+asyncpg://", 1)
-elif _raw.startswith("postgres://"):
-    DATABASE_URL = _raw.replace("postgres://", "postgresql+asyncpg://", 1)
+elif _raw.startswith("postgresql://") or _raw.startswith("postgres://"):
+    # Try asyncpg first, fall back to SQLite if not installed
+    try:
+        import asyncpg  # noqa: F401
+        DATABASE_URL = _raw.replace("postgres://", "postgresql+asyncpg://", 1).replace("postgresql://", "postgresql+asyncpg://", 1)
+    except ImportError:
+        print(f"WARNING: asyncpg not installed, falling back to SQLite. POSTGRES_URL={_raw[:50]}...")
+        DATABASE_URL = "sqlite+aiosqlite:///./paydrift.db"
 else:
     DATABASE_URL = _raw
 
