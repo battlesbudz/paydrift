@@ -46,11 +46,11 @@ app.add_middleware(
 )
 
 # API routes
-app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
-app.include_router(clients.router, prefix="/api/clients", tags=["clients"])
-app.include_router(invoices.router, prefix="/api/invoices", tags=["invoices"])
-app.include_router(stripe.router, prefix="/api/stripe", tags=["stripe"])
-app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
+app.include_router(auth.router, prefix="/v1/auth", tags=["auth"])
+app.include_router(clients.router, prefix="/v1/clients", tags=["clients"])
+app.include_router(invoices.router, prefix="/v1/invoices", tags=["invoices"])
+app.include_router(stripe.router, prefix="/v1/stripe", tags=["stripe"])
+app.include_router(dashboard.router, prefix="/v1/dashboard", tags=["dashboard"])
 
 # Serve React frontend built files (SPA) — embedded in backend/static_frontend/
 # Direct file serving via FileResponse (avoids StaticFiles issues on Railway)
@@ -83,8 +83,8 @@ async def serve_favicon():
 
 @app.get("/")
 async def root():
-    # Fast path: Railway health checks "/" — return plain text OK immediately.
-    # The SPA is served at /app for actual users. Non-root health checks at /health.
+    # Railway health checks "/" — must return plain text so Edge doesn't wrap with HTML.
+    # Edge intercepts JSON/text-html responses and replaces the body with its placeholder page.
     from fastapi.responses import PlainTextResponse
     return PlainTextResponse("OK", media_type="text/plain")
 
@@ -102,10 +102,10 @@ async def debug():
         "ts": datetime.datetime.utcnow().isoformat(),
     }
 
-@app.get("/api/test")
-async def api_test():
-    return {"status": "ok", "message": "API routing works!"}
-
+@app.get("/v1/test")
+async def v1_test():
+    """Test endpoint to verify Railway Edge routing."""
+    return {"status": "ok", "service": "paydrift", "version": "2.0"}
 
 @app.get("/health")
 async def health():
